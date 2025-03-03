@@ -27,32 +27,59 @@ function submitQuiz() {
         return;
     }
 
-    let result = {
-        name: userName,
-        answer: selectedAnswer.value
-    };
-
-    console.log("Quiz submitted:", result);
+    // Create a form to submit the data
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'YOUR_NEW_GOOGLE_SCRIPT_URL_HERE'; // Replace with your new URL
+    form.target = '_blank'; // This opens in a new tab
+    
+    // Add the username as a hidden field
+    const nameField = document.createElement('input');
+    nameField.type = 'hidden';
+    nameField.name = 'name';
+    nameField.value = userName;
+    form.appendChild(nameField);
+    
+    // Add the answer as a hidden field
+    const answerField = document.createElement('input');
+    answerField.type = 'hidden';
+    answerField.name = 'answer';
+    answerField.value = selectedAnswer.value;
+    form.appendChild(answerField);
+    
+    // Add the form to the document and submit it
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
+    
+    // Show confirmation to user
     alert(`Thank you, ${userName}! Your answer has been submitted.`);
-
-    // Send data to Google Sheets
-    sendToGoogleSheets(result);
 }
 
 function sendToGoogleSheets(data) {
-    // Create a URL with parameters
-    const url = `https://script.google.com/macros/s/AKfycbzkwG2yOuOw0Ec6eQRXKdAxY5lP9UqOuhq3fmSsQrt6sib9tgZU4Z8hYpZ4tEUbDTz5lw/exec?name=${encodeURIComponent(data.name)}&answer=${encodeURIComponent(data.answer)}`;
+    // Create a new form element
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'https://script.google.com/macros/s/AKfycbzkwG2yOuOw0Ec6eQRXKdAxY5lP9UqOuhq3fmSsQrt6sib9tgZU4Z8hYpZ4tEUbDTz5lw/exec';
+    form.style.display = 'none'; // Hide the form
     
-    // Create an invisible iframe
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = url;
+    // Add data as hidden form fields
+    const nameField = document.createElement('input');
+    nameField.type = 'hidden';
+    nameField.name = 'name';
+    nameField.value = data.name;
+    form.appendChild(nameField);
     
-    // Add to document, wait a bit, then remove
-    document.body.appendChild(iframe);
-    setTimeout(() => {
-        document.body.removeChild(iframe);
-    }, 5000);
+    const answerField = document.createElement('input');
+    answerField.type = 'hidden';
+    answerField.name = 'answer';
+    answerField.value = data.answer;
+    form.appendChild(answerField);
     
-    console.log("Data sent to Google Sheets");
+    // Add the form to the document and submit it
+    document.body.appendChild(form);
+    form.submit();
+    
+    // Show success message directly without waiting for response
+    alert(`Thank you, ${data.name}! Your answer has been submitted.`);
 }
